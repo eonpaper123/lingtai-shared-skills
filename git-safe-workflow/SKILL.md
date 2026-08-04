@@ -8,8 +8,8 @@ description: >
   Use before the first `git` write in a task; it does NOT grant push/merge
   authority, is not a project-convention list, and must never be used to clean
   up someone else's work.
-version: 1.0.0
-last_changed_at: "2026-08-04T19:17:00+08:00"
+version: 1.0.1
+last_changed_at: "2026-08-04T19:52:30+08:00"
 tags: [git, workflow, security, evidence]
 ---
 

@@ -142,10 +142,16 @@ try {
     $Report.upstream = $upstream
     $counts = Invoke-Git @('rev-list', '--left-right', '--count', 'HEAD...@{upstream}')
     if ($null -ne $counts) {
-      $parts = $counts -split "`t"
-      if ($parts.Count -ge 2) {
-        $null = [int]::TryParse($parts[0], [ref]$Report.ahead)
-        $null = [int]::TryParse($parts[1], [ref]$Report.behind)
+      $parts = $counts.Trim() -split '\s+'
+      $parsedAhead = 0
+      $parsedBehind = 0
+      if ($parts.Count -ge 2 -and
+          [int]::TryParse($parts[0], [ref]$parsedAhead) -and
+          [int]::TryParse($parts[1], [ref]$parsedBehind)) {
+        $Report.ahead = $parsedAhead
+        $Report.behind = $parsedBehind
+      } else {
+        Add-Warning 'ahead/behind output could not be parsed'
       }
     } else {
       Add-Warning 'ahead/behind unavailable (unborn HEAD or unusual history)'
