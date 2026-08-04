@@ -2,12 +2,11 @@
 name: telegram-station-outbound
 description: >
   Safe Telegram reaction/reply fallback when an `mcp.telegram` notification arrives but no
-  dedicated Telegram action exists. Uses the existing local `.secrets/telegram.json` through
-  PowerShell without exposing the bot credential. v1.1 adds an opt-in caller-escaped HTML branch
-  with entity evidence and one diagnosed plain fallback; it never provisions credentials or sends
-  documents.
-version: 1.1.0
-last_changed_at: "2026-08-04T19:17:00+08:00"
+  dedicated Telegram action exists. Applies 👀 only after the Agent actually reads the message in
+  its own live turn, uses the existing local secret without exposing it, and supports structured
+  plain text or verified lightweight HTML text. It never provisions credentials or sends documents.
+version: 1.2.0
+last_changed_at: "2026-08-04T22:00:00+08:00"
 tags: [powershell, telegram, workflow, security]
 ---
 
@@ -23,7 +22,7 @@ Use this procedure only when all are true:
 4. `.secrets/telegram.json` already exists and belongs to this station bot.
 5. The requested reaction/reply is authorized by the incoming human message or standing channel policy.
 
-Prefer a real Telegram producer tool when one exists. This is a station fallback, not an MCP installer and not a credential-provisioning procedure. It defaults to plain text; the optional HTML branch is available only after station-specific `parse_mode` proof and caller-owned escaping. A successful send proves transport, never human-visible rendering.
+Prefer a real Telegram producer tool when one exists. This is a station fallback, not an MCP installer and not a credential-provisioning procedure. It uses structured plain text when rich support is unproven. After station-specific `parse_mode` proof and caller-owned escaping, ordinary non-trivial messages may use lightweight HTML text (for example one bold heading plus bullets); that does not imply a standalone HTML artifact. A successful send proves transport, never human-visible rendering.
 
 ## Non-negotiable security rules
 
@@ -63,7 +62,14 @@ $base = 'https://api.telegram.org/bot' + $token
 
 Do not output `$token` or `$base`.
 
-### 4. Mark the original message seen
+### 4. Mark the original message seen — only after the Agent reads it
+
+This step is allowed only after the message content has been delivered into the
+Agent's current live turn and the Agent has actually consumed it. Never call it
+from a webhook, polling loop, station bridge, listener, notification producer, or
+other ingress path. An automatically present 👀 is not proof of Agent reading and
+does not satisfy this step; record the Agent's own later tool action and escalate
+the ingress automation for removal.
 
 ```powershell
 $reactionBody = @{
@@ -144,7 +150,8 @@ If dismissal is guarded or fails, do not force it merely to make the queue look 
 Report these facts to the coordinating agent:
 
 - original message id
-- reaction success
+- evidence that the reaction call occurred only after the Agent received and read the message in its live turn
+- reaction success from that Agent-initiated call (not an ingress reaction)
 - new reply message id
 - parse mode used (plain or HTML) and, for HTML, `entity_count`/`entity_types`
 - notification dismissal result

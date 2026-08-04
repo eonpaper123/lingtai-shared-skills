@@ -1,12 +1,12 @@
 ---
 name: telegram-progress-cadence
 description: >
-  Rawle's standing Telegram responsiveness procedure for long tasks: react with 👀 immediately,
-  send a fast acknowledgement and model/plan note (prefer gpt-5.6-luna when already available),
-  then report every five minutes until final delivery. Use for any Rawle task expected or observed
-  to exceed five minutes, including delegated project work and blocked waits.
-version: 1.0.0
-last_changed_at: "2026-08-04T16:58:00+08:00"
+  Rawle's standing Telegram responsiveness procedure for long tasks: after the Agent actually reads
+  the message in its own live turn, apply 👀 with an Agent-initiated tool action, send a fast
+  acknowledgement and model/plan note, then report every five minutes until final delivery. Never
+  treat ingress/webhook/bridge auto-reactions as evidence that the Agent has read the message.
+version: 1.1.0
+last_changed_at: "2026-08-04T22:00:00+08:00"
 tags: [telegram, progress, responsiveness, long-running, workflow]
 ---
 
@@ -16,10 +16,13 @@ tags: [telegram, progress, responsiveness, long-running, workflow]
 
 For every task from Rawle on Telegram:
 
-1. React 👀 on the original message as soon as it is seen.
-2. Send a short acknowledgement immediately in the same bot/chat.
-3. If the task is expected or observed to exceed five minutes, send a progress update every five minutes from receipt until final delivery.
-4. Send a complete final result; progress messages do not replace delivery.
+1. Let the Agent actually consume the message content in its own live turn.
+2. Only then, use an Agent-initiated reaction tool/API call to place 👀 on that original message.
+3. Send a short acknowledgement immediately in the same bot/chat.
+4. If the task is expected or observed to exceed five minutes, send a progress update every five minutes from receipt until final delivery.
+5. Send a complete final result; progress messages do not replace delivery.
+
+The 👀 is a semantic receipt: “this Agent has read this message.” A webhook, polling loop, station bridge, listener, or other ingress layer must not add it at arrival time. An ingress-time 👀 does not count even if the Bot API returned success. If such automation exists, report the receipt as untrustworthy, disable or escalate that behavior, and preserve evidence of the Agent's later explicit reaction call.
 
 Project-specific work must be performed and reported by the owning project total unless Rawle explicitly assigns another executor. The controller routes, monitors, and verifies.
 
@@ -30,13 +33,13 @@ Prefer `gpt-5.6-luna` for the quick acknowledgement/initial plan **when that rou
 Template:
 
 ```text
-👀 已收到：<任务>
+已收到：<任务>
 准备先用 <模型> 做 <plan/first check>，再用 <模型/工具> 执行 <main work>。
 首个可验证结果预计：<time>。
 若超过 5 分钟，我会每 5 分钟汇报进度。
 ```
 
-The acknowledgement must be short. Do not front-load the whole analysis.
+Do not place a decorative 👀 in the acknowledgement text as a substitute for the actual reaction on the original message. Retain the source message ID and reaction receipt when evidence matters. The acknowledgement must be short. Do not front-load the whole analysis.
 
 ## Five-minute clock
 

@@ -1,14 +1,13 @@
 ---
 name: telegram-readable-delivery
 description: >
-  Capability-first decision tree for human-facing Telegram delivery: confirm what
-  the sending station's producer actually supports, pick exactly one profile
-  (controlled HTML, MarkdownV2, entities, document, or plain text), escape
-  dynamic data, and lead with the outcome. Use before any format-rich send; it
-  does NOT grant rich output to stations without a verified producer, does not
-  render HTML tables, and provisions no credentials.
-version: 1.0.0
-last_changed_at: "2026-08-04T19:17:00+08:00"
+  Capability-first decision tree for human-facing Telegram delivery: make readable
+  message text the default, use lightweight emphasis on verified producers, and
+  escalate to standalone HTML/chart/document artifacts only when they add value.
+  Covers profile selection, escaping, outcome-first structure, transport evidence,
+  and the structured-plain fallback; it provisions no credentials.
+version: 1.1.0
+last_changed_at: "2026-08-04T22:00:00+08:00"
 tags: [telegram, rendering, workflow, escape]
 ---
 
@@ -34,22 +33,26 @@ skill is not authorization to send it.
    and confirm on the live tool surface: does it accept `parse_mode`? Which
    modes? Does it support `media.type='document'`? Recording that "another
    station supports HTML" is not capability.
-3. **Choose exactly one profile**, in this order:
-   - **HTML** — only when `parse_mode='HTML'` is demonstrated by this producer
-     (controlled subset below). HTML tables do not render in Telegram; do not
-     claim or build them.
-   - **MarkdownV2** — only where the station has a tested escaper for every
+3. **Choose the readable text baseline first**, using exactly one profile:
+   - **Lightweight HTML text** — the default for non-trivial messages only when
+     this producer has demonstrated `parse_mode='HTML'`. Use one short `<b>`
+     outcome/title, selective bold labels, short paragraphs, bullets and
+     punctuation. This is a normal Telegram text message, not a standalone HTML
+     page or an HTML table.
+   - **MarkdownV2 text** — only where the station has a tested escaper for every
      reserved character; never ad-hoc concatenation of dynamic text.
-   - **Entities** — only through a tested builder that computes
+   - **Entity-formatted text** — only through a tested builder that computes
      Telegram-compatible offsets over the final Unicode text; never a hand-built
      plan combined with a parse-mode template.
-   - **Document** — only when `media.type='document'` is supported and the
-     artifact is approved, non-secret, and must stay intact. Never paste a local
-     file path into chat text; put a short readable caption/message beside it.
-   - **Plain text** — the default when no rich profile is verified, when the
-     message is short, or when reliability matters more than styling. Use
-     visible headings and compact bullets, not `**bold**`, fences, or
-     pseudo-tables.
+   - **Structured plain text** — use when no rich profile is verified, parsing
+     fails, the message is too small to benefit from markup, or reliability
+     matters more than emphasis. Use visible headings, short paragraphs, compact
+     bullets and punctuation; do not emit raw `**bold**`, fences, or pseudo-tables.
+4. **Escalate to a rich artifact only when it adds value.** A standalone HTML
+   report, chart/image, wide matrix, or document is not the default. Use a
+   document only when the producer supports it, the approved non-secret artifact
+   must stay intact, and inline text would be materially worse. Always accompany
+   it with a short readable summary; never paste a local file path as delivery.
 4. **Escape dynamic data for the chosen profile.** Every value not fixed in the
    template — user text, names, paths, errors, generated values — is data, not
    markup. The producer passes text and formatting through without an observed
