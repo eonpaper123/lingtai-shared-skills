@@ -2,8 +2,8 @@
 name: agent-memory-molt-policy
 description: |
   Cross-model policy for deciding when LingTai agents should update or compact Pad/LingTai, summarize and rebuild conversation context, and perform a molt. Use when setting agent memory budgets, interpreting context pressure, or standardizing behavior across models; it does not replace context-manual's mandatory pre-molt store and session-journal procedure.
-version: 1.1.0
-last_changed_at: "2026-08-04T22:33:00+08:00"
+version: 1.2.0
+last_changed_at: "2026-08-04T23:45:00+08:00"
 tags: [workflow, reference]
 ---
 
@@ -126,8 +126,8 @@ When the Agent has a verified Rawle Telegram outbound route, add this mandatory 
 
 1. Finish the durable handoff far enough that `context(action="molt")` is the next lifecycle step.
 2. Send an “entering molt now” Telegram notice from the Agent's own window with the reason, honest recovery ETA in minutes, current task state, and first post-recovery action.
-3. Persist the successful account/chat/message ID, timestamp, ETA, and requested `👌🏿` recovery reaction in the session-journal child or Pad.
-4. After recovery, use the recovered Agent's own tool action to react to that exact notice with `👌🏿`, report actual recovery time, and resume the task/cadence. If Telegram explicitly rejects the skin-tone variant, preserve one failure receipt, transparently fall back once to base `👌`, and explain the downgrade in the same thread.
+3. Persist the successful account/chat/message ID, timestamp, ETA, and requested base `👌` recovery reaction in the session-journal child or Pad.
+4. After recovery, use the recovered Agent's own tool action to react to that exact notice directly with base `👌`, report actual recovery time, and resume the task/cadence. Do not attempt `👌🏿` first or substitute another emoji; if base `👌` fails, preserve the typed failure receipt and report the lifecycle acknowledgement as blocked.
 
 Read `telegram-molt-lifecycle` for the full templates, evidence contract, send-failure branch, and no-credential rule.
 

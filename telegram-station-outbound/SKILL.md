@@ -3,11 +3,11 @@ name: telegram-station-outbound
 description: >
   Safe Telegram reaction/reply fallback when an `mcp.telegram` notification arrives but no
   dedicated Telegram action exists, plus the stored-message branch for reacting to an Agent's own
-  pre-molt notice after recovery. Applies 👀 only after actual live-turn reading, preserves Rawle's
-  requested 👌🏿 recovery semantics with a transparent unsupported-emoji fallback, uses the existing
-  local secret without exposing it, and never provisions credentials or sends documents.
-version: 1.3.0
-last_changed_at: "2026-08-04T22:33:00+08:00"
+  pre-molt notice after recovery. Applies 👀 only after actual live-turn reading, uses Rawle's latest
+  direct base-👌 recovery semantics, uses the existing local secret without exposing it, repairs a
+  missing Agent-open 👀 when necessary, and never provisions credentials or sends documents.
+version: 1.4.0
+last_changed_at: "2026-08-04T23:45:00+08:00"
 tags: [powershell, telegram, workflow, security]
 ---
 
@@ -63,14 +63,12 @@ $base = 'https://api.telegram.org/bot' + $token
 
 Do not output `$token` or `$base`.
 
-### 4. Mark the original message seen — only after the Agent reads it
+### 4. Repair a missing Agent-open receipt when necessary
 
-This step is allowed only after the message content has been delivered into the
-Agent's current live turn and the Agent has actually consumed it. Never call it
-from a webhook, polling loop, station bridge, listener, notification producer, or
-other ingress path. An automatically present 👀 is not proof of Agent reading and
-does not satisfy this step; record the Agent's own later tool action and escalate
-the ingress automation for removal.
+The station runtime applies 👀 only after successful delivery, when the message enters
+the Agent's current turn and is opened. It must not react at raw polling or queueing.
+If the open-time hook fails, the Agent applies 👀 as its first action and reports the
+fallback. An existing Agent-open 👀 is valid and should not be removed or repeated.
 
 ```powershell
 $reactionBody = @{
@@ -166,12 +164,12 @@ Read `telegram-molt-lifecycle` first. This branch is for a recovered Agent that 
 
 1. Load only the non-secret `account`, `chat_id`, `message_id`, send timestamp, and requested recovery reaction from the persisted lifecycle block.
 2. Verify the account still maps to this station's existing `.secrets/telegram.json`; never copy a credential across bots.
-3. Use the same secret-loading pattern above. Build `setMessageReaction` for the exact stored `chat_id`/`message_id` and first attempt Rawle's requested emoji `👌🏿`.
-4. If Telegram returns a typed 400/invalid-reaction style rejection, preserve that one failure receipt, retry once with base `👌`, and send a same-thread recovery reply that explicitly states the skin-tone variant was rejected. Do not loop and do not claim `👌🏿` succeeded.
-5. Return safe evidence: stored notice message ID, exact accepted emoji, reaction success, recovery reply message ID, and actual elapsed recovery time. Never output the token, base URI, or secret JSON.
+3. Use the same secret-loading pattern above. Build `setMessageReaction` for the exact stored `chat_id`/`message_id` and use Rawle's latest requested base emoji `👌` directly.
+4. If Telegram returns a typed 400/invalid-reaction rejection for base `👌`, preserve that one failure receipt and report the lifecycle acknowledgement as blocked; do not guess or retry an alternate emoji.
+5. Return safe evidence: stored notice message ID, exact accepted emoji (when accepted), reaction success, recovery reply message ID, and actual elapsed recovery time. Never output the token, base URI, or secret JSON.
 6. Mark the durable lifecycle receipt complete only after the reaction/reply result is known.
 
-This is a lifecycle-completion reaction, not an actual-read receipt. Do not use `👌🏿` or `👌` as a substitute for the 👀 semantics on Rawle's incoming message, and do not add it from a bridge/listener before the recovered Agent runs.
+This is a lifecycle-completion reaction, not the ordinary Agent-open receipt. Do not use `👌` as a substitute for 👀 on Rawle's incoming message.
 
 ## Failure branches
 

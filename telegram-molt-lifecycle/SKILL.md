@@ -3,11 +3,11 @@ name: telegram-molt-lifecycle
 description: >
   Rawle's Telegram lifecycle contract for LingTai molt. Before an Agent-initiated molt, announce
   reason, ETA and resumable state and persist the message receipt; after recovery, react to that
-  notice with 👌🏿 and report actual time. Read before any Agent-initiated context molt or after a
-  system-forced molt with no pre-notice. It exposes the forced-molt runtime-hook boundary and never
-  authorizes credential provisioning.
-version: 1.0.0
-last_changed_at: "2026-08-04T22:33:00+08:00"
+  notice directly with base 👌 and report actual time. Read before any Agent-initiated context molt
+  or after a system-forced molt with no pre-notice. It exposes the forced-molt runtime-hook boundary
+  and never authorizes credential provisioning.
+version: 1.1.0
+last_changed_at: "2026-08-04T23:45:00+08:00"
 tags: [telegram, workflow, lifecycle, context]
 ---
 
@@ -20,7 +20,7 @@ For every Agent that has a verified Rawle Telegram outbound route:
 1. Immediately before the Agent calls `context(action="molt")`, send a Telegram notice from that Agent's own bot/window.
 2. State the molt reason, honest ETA in minutes, current task state, and the first post-recovery action.
 3. Persist the successful outbound receipt so the successor can locate the exact notice message.
-4. After recovery, make the first lifecycle acknowledgement an Agent-initiated reaction on that same notice: Rawle requested `👌🏿`.
+4. After recovery, make the first lifecycle acknowledgement an Agent-initiated reaction on that same notice: Rawle's latest instruction requires base `👌` directly.
 5. Report actual recovery time and resume or re-route the interrupted task.
 
 This complements `context-manual`; it does not replace the mandatory four-store, session-journal, and successor-briefing procedure.
@@ -58,7 +58,7 @@ molt_notice:
   message_id: <outbound notice message id>
   sent_at: <ISO 8601>
   eta_minutes: <number or range>
-  requested_recovery_reaction: "👌🏿"
+  requested_recovery_reaction: "👌"
   status: pending_recovery
 ```
 
@@ -74,10 +74,10 @@ Call `context(action="molt")` only after the notice receipt and its durable loca
 
 1. Reconstruct from Pad, the molt summary, session journal, and current producer messages.
 2. Locate the exact pre-molt Telegram message from the durable `molt_notice` block. Do not search by vague text when a message ID exists.
-3. From the recovered Agent's own tool action, attempt to add Rawle's requested `👌🏿` reaction to that message.
-4. If Telegram explicitly rejects that exact reaction as unsupported, preserve the one failure receipt, retry once with base `👌`, and reply in the same thread that the platform rejected the skin-tone variant. Do not loop and do not claim `👌🏿` succeeded when it did not.
+3. From the recovered Agent's own tool action, add Rawle's latest requested base `👌` reaction directly to that message.
+4. If Telegram explicitly rejects base `👌`, preserve that one typed failure receipt and report the lifecycle acknowledgement as blocked; do not guess or retry another emoji.
 5. Send a short recovery status with actual elapsed time, current task state, and the first resumed action. Resume the ordinary five-minute cadence if a long task is still active.
-6. Mark the durable lifecycle block `complete` with reaction/reply receipts, or archive it in the session journal; do not leave a stale pending marker.
+6. Mark the durable lifecycle block `complete` with reaction/reply receipts, or `blocked` with the typed failure receipt; do not leave a stale pending marker.
 
 A transport success proves the API accepted the action. It does not prove Rawle visually saw it; keep transport and visual claims separate.
 
@@ -107,6 +107,6 @@ Keep these non-secret facts for acceptance:
 - announced ETA and actual recovery duration;
 - session-journal/Pad locator carrying the receipt;
 - post-recovery reaction tool/API receipt and exact emoji accepted;
-- fallback explanation if `👌🏿` was rejected and base `👌` was used;
+- direct base `👌` result, or the typed failure receipt if that exact reaction was rejected; no alternate-emoji fallback;
 - recovery reply message ID;
 - confirmation that no credential, unapproved configuration, project code, restart, refresh, push, or publish side effect occurred merely to satisfy the notification.

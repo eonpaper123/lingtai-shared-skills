@@ -4,10 +4,10 @@ description: >
   Rawle's standing rule that every Telegram message is timely steering, not an isolated FIFO job.
   Read when Telegram messages arrive during active work, when Rawle sends several short fragments,
   before deciding whether to merge scope or delegate a subtask, or when a station bridge queues input
-  behind a long Agent turn. Preserves source ordering, latest-scope/authorization checks, actual-read
-  receipts, safe tool boundaries, and the separate runtime injection gap.
-version: 1.0.0
-last_changed_at: "2026-08-04T22:44:00+08:00"
+  behind a long Agent turn. Preserves source ordering, Agent-open receipts, safe tool boundaries, and the
+  separate runtime injection gap.
+version: 1.1.0
+last_changed_at: "2026-08-04T23:25:00+08:00"
 tags: [telegram, workflow, communication, routing]
 ---
 
@@ -23,11 +23,11 @@ This does not make every new sentence an unquestionable command. Apply evidence,
 
 ## Live-turn procedure
 
-### 1. Read the producer source at the next safe boundary
+### 1. Deliver first, then acknowledge at the Agent-open boundary
 
-When an `mcp.telegram` event appears, inspect the producer-owned current message and any adjacent unhandled messages in the same conversation. Notification summaries are not enough when text is truncated, ambiguous, media-bearing, or missing ordering anchors.
+Authorized LingTai ingress must first receive and successfully deliver each Rawle message without reacting during raw polling, receipt, or queueing. When the delivered message enters the Agent's current turn and is opened, the runtime immediately places 👀 on the original message before deeper interpretation or execution. Preserve a valid Agent-open 👀; if that hook fails, repair it as the Agent's first action and report the fallback.
 
-React 👀 to each Rawle message only after this Agent actually reads it in the live turn. A bridge/listener/webhook reaction is never an Agent receipt.
+When the message becomes Agent-visible, inspect the producer-owned current message and any adjacent unhandled messages in the same conversation. Notification summaries are not enough when text is truncated, ambiguous, media-bearing, or missing ordering anchors.
 
 If a deterministic tool call is already running, do not corrupt or kill it merely to simulate immediacy. Incorporate new steering at the first safe Agent/tool boundary. Before any externally consequential side effect, re-check the latest producer messages even if an earlier plan was already approved.
 
@@ -58,7 +58,7 @@ Do not delegate merely to avoid understanding Rawle's combined intent. Before a 
 
 ### 4. Reply and keep cadence
 
-Acknowledge promptly in the same Telegram window, state how the new steering changes or joins the plan, and name the model/body route. For an active long task, a material steering reply counts as an immediate update but does not permit future silence; continue the task-specific cadence Rawle currently set.
+Acknowledge promptly in the same Telegram window, state how the new steering changes or joins the plan, and name the model/body route. For an active long task, a material steering reply counts as an immediate update but does not permit future silence; continue the task-specific cadence Rawle currently set and use the chained delayed self-email procedure in `telegram-progress-cadence`.
 
 When steering changes a tracked plan, update the Task Card promptly and follow `task-card-chinese`: all human-facing headings and prose must be Chinese, with English retained only for necessary technical proper nouns, commands, paths, model/API/protocol names, hashes and exact identifiers.
 
@@ -66,7 +66,9 @@ If several fragments can be answered coherently together, one anchored response 
 
 ## Runtime/bridge acceptance boundary
 
-Agent procedure alone cannot deliver a Telegram update into an already-running outer host turn. A bridge that only logs `accepted/queued` and waits for the turn to end does not satisfy Rawle's steering-stream requirement.
+Agent procedure alone cannot deliver a Telegram update into an already-running outer host turn. A bridge that only logs `accepted/queued` and waits for the turn to end does not satisfy Rawle's steering-stream requirement; raw acceptance/queueing also does not authorize 👀.
+
+For an admitted update, the transport must not advance its durable Telegram offset until durable inbox persistence and Agent notification delivery have succeeded. A delivery exception must propagate so the same update is retried with a stable identity; configuration loaders must normalize numeric Telegram user IDs before admission. Silently committing an admitted update that failed delivery is data loss, not successful ingress.
 
 A conforming runtime should, at minimum:
 
@@ -74,19 +76,20 @@ A conforming runtime should, at minimum:
 2. de-duplicate delivery without dropping later fragments;
 3. make new steering visible to the running Agent at the next safe tool/LLM boundary, not only after the outer task completes;
 4. allow the Agent to revise/cancel not-yet-executed work before external side effects;
-5. keep reaction/reply actions Agent-originated and once-only;
+5. apply 👀 when the successfully delivered message becomes Agent-visible/opened and preserve attributable Agent acknowledgement/progress actions;
 6. avoid killing a currently executing non-idempotent tool call solely to inject text;
 7. retain an explicit queued/deferred state when no safe boundary exists, with observable latency and recovery evidence.
 
-Until the runtime path is verified, label this as a delivery gap. Do not claim that installing this skill makes queued bridges real-time.
+Until the runtime injection path is verified, label that as a delivery gap. Do not claim that installing this skill makes queued bridges real-time and do not add 👀 before Agent visibility.
 
 ## Evidence checklist
 
 For policy acceptance, record:
 
 - producer account/conversation and ordered message/event/update IDs;
-- arrival time, first Agent-visible safe boundary and actual-read time;
-- Agent-originated 👀 receipts and same-channel reply IDs;
+- arrival/accepted/queued time without an early reaction;
+- first Agent-visible/open boundary, Agent-open 👀 result, actual-read time, and same-channel acknowledgement reply ID;
+- whether any missing Agent-open receipt required Agent repair and its typed result;
 - whether steering merged, revised, stopped or split the active work, with the reason;
 - daemon/avatar handoff contract when delegated;
 - latest-instruction recheck before external side effects/review;
