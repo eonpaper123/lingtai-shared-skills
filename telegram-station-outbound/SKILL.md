@@ -1,13 +1,13 @@
 ---
 name: telegram-station-outbound
 description: >
-  Safe Telegram reaction/reply fallback for LingTai station agents whose station bridge delivers
-  `mcp.telegram` notifications but whose active tool surface has no dedicated Telegram action.
-  Uses an existing local `.secrets/telegram.json` through PowerShell shell without revealing the
-  bot credential, then clears the handled notification. Do not use this skill to provision a new
-  credential, and never use a credential pasted into chat; rotate exposed values first.
-version: 1.0.0
-last_changed_at: "2026-08-04T16:22:20+08:00"
+  Safe Telegram reaction/reply fallback when an `mcp.telegram` notification arrives but no
+  dedicated Telegram action exists. Uses the existing local `.secrets/telegram.json` through
+  PowerShell without exposing the bot credential. v1.1 adds an opt-in caller-escaped HTML branch
+  with entity evidence and one diagnosed plain fallback; it never provisions credentials or sends
+  documents.
+version: 1.1.0
+last_changed_at: "2026-08-04T19:17:00+08:00"
 tags: [powershell, telegram, workflow, security]
 ---
 
@@ -23,7 +23,7 @@ Use this procedure only when all are true:
 4. `.secrets/telegram.json` already exists and belongs to this station bot.
 5. The requested reaction/reply is authorized by the incoming human message or standing channel policy.
 
-Prefer a real Telegram producer tool when one exists. This is a station fallback, not an MCP installer and not a credential-provisioning procedure.
+Prefer a real Telegram producer tool when one exists. This is a station fallback, not an MCP installer and not a credential-provisioning procedure. It defaults to plain text; the optional HTML branch is available only after station-specific `parse_mode` proof and caller-owned escaping. A successful send proves transport, never human-visible rendering.
 
 ## Non-negotiable security rules
 
@@ -32,6 +32,7 @@ Prefer a real Telegram producer tool when one exists. This is a station fallback
 - Build the secret property name dynamically (`'bot_' + 'token'`). A direct property reference can be replaced by a secret redactor and fail as a literal placeholder.
 - If a human pastes a new credential into chat, treat it as exposed. Do **not** call, validate, persist, or deploy it. React/acknowledge, ask for immediate BotFather revoke/regenerate, and request secure local secret-store injection. A private chat is still message history and may be mirrored into notifications/logs.
 - Do not modify project code. Agent or bot configuration changes require separate authorization and the exact addon/secret manual.
+- This procedure does **not** send documents (no media/document support) and does **not** provision credentials.
 
 ## Procedure
 
@@ -77,26 +78,55 @@ $reaction = Invoke-RestMethod -Method Post `
   -Body $reactionBody
 ```
 
-### 5. Reply on Telegram
+### 5. Reply on Telegram (plain, default)
 
 ```powershell
+$parseModeUsed = 'plain'
 $reply = Invoke-RestMethod -Method Post `
   -Uri ($base + '/sendMessage') `
   -ContentType 'application/json' `
   -Body (@{ chat_id = '<CHAT_ID>'; text = '<REPLY_TEXT>' } | ConvertTo-Json -Compress)
 ```
 
-Return only safe evidence:
+### 5a. Optional controlled HTML reply (opt-in only)
+
+Use `parse_mode='HTML'` only when **all** hold:
+
+1. The send path actually carries `parse_mode` to the Bot API (this station's wrapper may not support it — if it cannot, stay plain);
+2. The caller explicitly opts in and owns escaping: every dynamic value — user text, names, paths, errors, generated values — is escaped for HTML text nodes (`&` → `&amp;` before `<` → `&lt;` and `>` → `&gt;`, quotes only inside attributes, prefer no dynamic attributes). Use the `telegram-readable-delivery` skill / its `escape_html.py`;
+3. The message uses the controlled subset (`<b>`, `<i>` sparingly, `<code>`, short `<pre>`, reviewed `<a href>`), with no tables, colours, or inbound markup.
 
 ```powershell
+$parseModeUsed = 'HTML'
+$reply = Invoke-RestMethod -Method Post `
+  -Uri ($base + '/sendMessage') `
+  -ContentType 'application/json' `
+  -Body (@{
+    chat_id = '<CHAT_ID>'
+    text = '<CALLER_ESCAPED_HTML_TEXT>'
+    parse_mode = 'HTML'
+  } | ConvertTo-Json -Compress)
+```
+
+Parse-error correction (exactly once): if the API returns a 400 "can't parse entities" style error, identify the single escaping/template defect (usually an unescaped `&`, `<`, `>` or a stray quote in an attribute), correct it, and retry once. If it still fails, resend the same content as plain text without `parse_mode` and report the fallback. Do not blindly retry an ambiguous send; first determine whether the message already arrived.
+
+### 6. Return only safe evidence
+
+```powershell
+$entities = @($reply.result.entities)
 [pscustomobject]@{
   reaction_ok = $reaction.ok
   reply_ok = $reply.ok
   reply_message_id = $reply.result.message_id
+  parse_mode_used = $parseModeUsed
+  entity_count = $entities.Count
+  entity_types = @($entities | ForEach-Object { $_.type } | Sort-Object -Unique)
 } | ConvertTo-Json -Compress
 ```
 
-### 6. Clear only after successful handling
+`entity_count`/`entity_types` are transport-level facts returned by the API when formatting was parsed; they are **not** proof that a human saw legible rich output.
+
+### 7. Clear only after successful handling
 
 After both reaction and reply succeed, call:
 
@@ -109,15 +139,17 @@ notification(action='dismiss_channel',
 
 If dismissal is guarded or fails, do not force it merely to make the queue look clean. Preserve the notification and report the exact error.
 
-### 7. Report evidence
+### 8. Report evidence
 
 Report these facts to the coordinating agent:
 
 - original message id
 - reaction success
 - new reply message id
+- parse mode used (plain or HTML) and, for HTML, `entity_count`/`entity_types`
 - notification dismissal result
 - live model/state when recovery verification is part of the task
+- transport vs visual: a successful API call proves transport only. Do **not** claim "rendered/rich delivery" without a designated verifier's visual confirmation in an approved route; otherwise say "sent, transport verified; visual confirmation pending".
 - confirmation that no credential, credential-bearing URI, project code, or unapproved config was printed/changed
 
 ## Failure branches
@@ -126,4 +158,6 @@ Report these facts to the coordinating agent:
 - **No secret file / missing field:** report the missing local secret path. Do not ask the human to paste a credential into chat.
 - **401/unauthorized:** treat the stored credential as invalid or revoked; request secure rotation.
 - **Reaction fails but send succeeds:** report partial completion; do not claim full handling.
+- **Parse error on HTML send:** apply the single diagnosed correction, retry once, then plain-text fallback (see 5a); never loop retries.
+- **HTML requested but the wrapper cannot carry `parse_mode`:** stay on the plain path and report rich delivery unavailable on this station.
 - **Human pasted credential:** acknowledge the message with the existing bot if possible, warn the human to revoke/regenerate, leave configuration untouched, and keep the task pending until secure local injection is confirmed.
