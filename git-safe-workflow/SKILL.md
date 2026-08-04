@@ -8,8 +8,8 @@ description: >
   Use before the first `git` write in a task; it does NOT grant push/merge
   authority, is not a project-convention list, and must never be used to clean
   up someone else's work.
-version: 1.0.1
-last_changed_at: "2026-08-04T19:52:30+08:00"
+version: 1.1.0
+last_changed_at: "2026-08-05T01:54:00+08:00"
 tags: [git, workflow, security, evidence]
 ---
 
@@ -38,6 +38,13 @@ local commit is never permission to publish or integrate.
 
 Each requires separate written authority plus, for destructive operations, a
 recovery plan. "It seemed safe" is not authority.
+
+## Rawle 强调（2026-08-05）
+
+所有 Agent 的开发都必须执行本 skill 的 git 管理（preflight、隔离分支/worktree、
+显式 staging、校验、原子提交、handoff 证据）。GitHub 连接已就绪：提交与 PR 纪律
+同样适用——未经单独授权不得 push/open/merge PR，不得破坏性、远程或强推操作，
+网络基线不变。
 
 ## Workflow
 
