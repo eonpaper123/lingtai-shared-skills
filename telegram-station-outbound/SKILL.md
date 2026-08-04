@@ -2,11 +2,12 @@
 name: telegram-station-outbound
 description: >
   Safe Telegram reaction/reply fallback when an `mcp.telegram` notification arrives but no
-  dedicated Telegram action exists. Applies 👀 only after the Agent actually reads the message in
-  its own live turn, uses the existing local secret without exposing it, and supports structured
-  plain text or verified lightweight HTML text. It never provisions credentials or sends documents.
-version: 1.2.0
-last_changed_at: "2026-08-04T22:00:00+08:00"
+  dedicated Telegram action exists, plus the stored-message branch for reacting to an Agent's own
+  pre-molt notice after recovery. Applies 👀 only after actual live-turn reading, preserves Rawle's
+  requested 👌🏿 recovery semantics with a transparent unsupported-emoji fallback, uses the existing
+  local secret without exposing it, and never provisions credentials or sends documents.
+version: 1.3.0
+last_changed_at: "2026-08-04T22:33:00+08:00"
 tags: [powershell, telegram, workflow, security]
 ---
 
@@ -16,11 +17,11 @@ tags: [powershell, telegram, workflow, security]
 
 Use this procedure only when all are true:
 
-1. The source event is an `mcp.telegram` notification.
+1. Either the source event is an `mcp.telegram` notification, or a recovered `telegram-molt-lifecycle` receipt identifies the exact Agent-authored pre-molt notice message that now needs its authorized recovery reaction.
 2. The agent has no dedicated Telegram producer action.
 3. Live capabilities include `shell`.
 4. `.secrets/telegram.json` already exists and belongs to this station bot.
-5. The requested reaction/reply is authorized by the incoming human message or standing channel policy.
+5. The requested reaction/reply is authorized by the incoming human message, the persisted lifecycle receipt, or standing channel policy.
 
 Prefer a real Telegram producer tool when one exists. This is a station fallback, not an MCP installer and not a credential-provisioning procedure. It uses structured plain text when rich support is unproven. After station-specific `parse_mode` proof and caller-owned escaping, ordinary non-trivial messages may use lightweight HTML text (for example one bold heading plus bullets); that does not imply a standalone HTML artifact. A successful send proves transport, never human-visible rendering.
 
@@ -158,6 +159,19 @@ Report these facts to the coordinating agent:
 - live model/state when recovery verification is part of the task
 - transport vs visual: a successful API call proves transport only. Do **not** claim "rendered/rich delivery" without a designated verifier's visual confirmation in an approved route; otherwise say "sent, transport verified; visual confirmation pending".
 - confirmation that no credential, credential-bearing URI, project code, or unapproved config was printed/changed
+
+## Molt lifecycle stored-message branch
+
+Read `telegram-molt-lifecycle` first. This branch is for a recovered Agent that has an exact, durable receipt for its own pre-molt Telegram notice; it is not permission to react to a vaguely matched historical message.
+
+1. Load only the non-secret `account`, `chat_id`, `message_id`, send timestamp, and requested recovery reaction from the persisted lifecycle block.
+2. Verify the account still maps to this station's existing `.secrets/telegram.json`; never copy a credential across bots.
+3. Use the same secret-loading pattern above. Build `setMessageReaction` for the exact stored `chat_id`/`message_id` and first attempt Rawle's requested emoji `👌🏿`.
+4. If Telegram returns a typed 400/invalid-reaction style rejection, preserve that one failure receipt, retry once with base `👌`, and send a same-thread recovery reply that explicitly states the skin-tone variant was rejected. Do not loop and do not claim `👌🏿` succeeded.
+5. Return safe evidence: stored notice message ID, exact accepted emoji, reaction success, recovery reply message ID, and actual elapsed recovery time. Never output the token, base URI, or secret JSON.
+6. Mark the durable lifecycle receipt complete only after the reaction/reply result is known.
+
+This is a lifecycle-completion reaction, not an actual-read receipt. Do not use `👌🏿` or `👌` as a substitute for the 👀 semantics on Rawle's incoming message, and do not add it from a bridge/listener before the recovered Agent runs.
 
 ## Failure branches
 

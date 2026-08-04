@@ -5,8 +5,8 @@ description: >
   the message in its own live turn, apply 👀 with an Agent-initiated tool action, send a fast
   acknowledgement and model/plan note, then report every five minutes until final delivery. Never
   treat ingress/webhook/bridge auto-reactions as evidence that the Agent has read the message.
-version: 1.1.0
-last_changed_at: "2026-08-04T22:00:00+08:00"
+version: 1.2.0
+last_changed_at: "2026-08-04T22:33:00+08:00"
 tags: [telegram, progress, responsiveness, long-running, workflow]
 ---
 
@@ -86,6 +86,12 @@ The delegating controller must tell the project total:
 - the evidence and final deliverable expected.
 
 The controller must not send substitute progress as though it came from the project total. It may tell Rawle that routing succeeded or report a delivery failure.
+
+## Molt during an active task
+
+A molt does not silently cancel the five-minute visibility contract. Immediately before an Agent-initiated molt, follow `telegram-molt-lifecycle`: send the pre-molt notice with reason/ETA/current state, persist its message ID, and after recovery react to that exact notice with Rawle's requested recovery reaction before resuming progress. Restart the next five-minute checkpoint from the recovery status message while the task remains active.
+
+If a system-forced molt occurred before the Agent had a live turn to send the notice, report that boundary truthfully on recovery and resume cadence immediately. Do not fabricate a pre-notice, and do not use a later reaction as retroactive proof.
 
 ## Final message
 
