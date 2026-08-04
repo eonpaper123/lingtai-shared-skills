@@ -8,8 +8,8 @@ description: >
   Use before the first `git` write in a task; it does NOT grant push/merge
   authority, is not a project-convention list, and must never be used to clean
   up someone else's work.
-version: 1.1.1
-last_changed_at: "2026-08-05T01:54:20+08:00"
+version: 1.2.0
+last_changed_at: "2026-08-05T01:56:00+08:00"
 tags: [git, workflow, security, evidence]
 ---
 
@@ -39,15 +39,11 @@ local commit is never permission to publish or integrate.
 Each requires separate written authority plus, for destructive operations, a
 recovery plan. "It seemed safe" is not authority.
 
-## Rawle 强调（2026-08-05）
+## Rawle 强调（2026-08-05，修正简化版）
 
-所有 Agent 的开发都必须执行本 skill 的 git 管理（preflight、隔离分支/worktree、
-显式 staging、校验、原子提交、handoff 证据）。GitHub 连接已就绪：提交与 PR 纪律
-同样适用——未经单独授权不得 push/open/merge PR，不得破坏性、远程或强推操作，
-网络基线不变。
-
-同时：开发成果必须<b>及时提交/PR</b>，按任务节点原子提交，避免丢失劳动成果；
-不要攒着一大堆改动直到最后。
+Rawle 的 git 管理要求就是：<b>做好本地 commit 记录与 GitHub 记录，及时 push/PR，
+不丢失劳动成果</b>。不要执行繁重的 preflight / 隔离分支 / staging 校验仪式，
+避免浪费 token。破坏性、远程删除或强推等操作仍须单独授权；其余保持简单直接。
 
 ## Workflow
 
