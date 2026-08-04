@@ -6,8 +6,8 @@ description: >
   progress, blockers, next steps and ETA; permits English only for technical proper nouns, commands,
   paths, model/API/protocol names, hashes and exact identifiers whose translation would be unnatural
   or lossy. Includes rendered-output verification and stale-card cleanup.
-version: 1.0.0
-last_changed_at: "2026-08-04T22:46:00+08:00"
+version: 1.1.0
+last_changed_at: "2026-08-05T01:39:00+08:00"
 tags: [task-card, language, chinese, readability]
 ---
 
@@ -87,6 +87,17 @@ Task Card renderer 应从小型、明确的状态源生成完整卡片。无论�
 ## 生命周期
 
 仅为 Rawle 正在跟踪的长期、多步骤或并行工作启用 Task Card。保持状态及时更新；任务完成、取消或放弃后使用 Task Card 工具的 `remove`，不得留下误导性的旧卡片。
+
+## 简洁性规则（2026-08-05 Rawle 要求）
+
+卡片的价值在于一目了然，不在于记录全部过程。不许叠加长历史；当卡片变得太长时，就是该精简或归档的信号。
+
+- 卡片正文输出限制在约 12 行内，渲染后一屏读完。
+- 保留栏目：状态、当前、阻塞、下一步、ETA；“已完成”合并为一行结论，不逐条叠加历史。
+- 详细过程、证据、错误与教训写入 session journal、knowledge 或 work/ 报告，卡片只留指针（路径即可）。
+- 重活交给 daemon 执行，卡片只反映结果与状态，不记载执行过程细节。
+- 任务完成、取消或放弃后必须 `remove`；暂停用 `stop` 保留最后正文，不允许已过时的旧卡片持续展示。
+- 收到可读性纠正时：先立即修当前可见卡片，再更新长期规范。
 
 ## 验收证据
 
