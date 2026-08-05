@@ -180,3 +180,9 @@ This is a lifecycle-completion reaction, not the ordinary Agent-open receipt. Do
 - **Parse error on HTML send:** apply the single diagnosed correction, retry once, then plain-text fallback (see 5a); never loop retries.
 - **HTML requested but the wrapper cannot carry `parse_mode`:** stay on the plain path and report rich delivery unavailable on this station.
 - **Human pasted credential:** acknowledge the message with the existing bot if possible, warn the human to revoke/regenerate, leave configuration untouched, and keep the task pending until secure local injection is confirmed.
+
+## Network hard rules (Rawle :249/:279 — 2026-08-05, control-total propagated)
+- 👀 read receipt is the FIRST action when you open a Rawle Telegram message: manually react 👀 via your own .secrets/telegram.json + curl setMessageReaction (auto-hook may fail; never skip).
+- Self-check: read your .status.json each turn; if active_turn.elapsed_seconds > 600 you are stuck — recover (kill escaped child trees / taskkill /T /F) or ask control-total; do not sit silent.
+- Long CLI children (opencode/codex/claude) can escape shell timeouts on Windows and wedge the turn; use async+poll or bounded process-tree-safe runs.
+- Control-total runs a 5-min stuck-agent watchdog (task LingTai_StuckAgentWatchdog) and will interrupt/restart stuck agents.
