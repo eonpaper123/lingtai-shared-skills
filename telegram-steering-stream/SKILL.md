@@ -1,8 +1,8 @@
 ---
 name: telegram-steering-stream
 description: >
-  Rawle's standing rule that every Telegram message is timely steering, not an isolated FIFO job.
-  Read when Telegram messages arrive during active work, when Rawle sends several short fragments,
+  Eon's standing rule that every Telegram message is timely steering, not an isolated FIFO job.
+  Read when Telegram messages arrive during active work, when Eon sends several short fragments,
   before deciding whether to merge scope or delegate a subtask, or when a station bridge queues input
   behind a long Agent turn. Preserves source ordering, Agent-open receipts, safe tool boundaries, and the
   separate runtime injection gap.
@@ -15,9 +15,9 @@ tags: [telegram, workflow, communication, routing]
 
 ## Core contract
 
-Treat every Telegram message from Rawle as a steering input that must be considered promptly with the Agent's current work. Do not model the conversation as unrelated FIFO jobs that can wait until a long outer turn finishes.
+Treat every Telegram message from Eon as a steering input that must be considered promptly with the Agent's current work. Do not model the conversation as unrelated FIFO jobs that can wait until a long outer turn finishes.
 
-Rawle often sends one sentence at a time and may complete or revise an instruction across several messages. The operative contract is therefore the ordered, current producer conversation—not whichever single message first started the task.
+Eon often sends one sentence at a time and may complete or revise an instruction across several messages. The operative contract is therefore the ordered, current producer conversation—not whichever single message first started the task.
 
 This does not make every new sentence an unquestionable command. Apply evidence, context, authorization, safety, and critical judgment; surface real conflicts respectfully.
 
@@ -25,7 +25,7 @@ This does not make every new sentence an unquestionable command. Apply evidence,
 
 ### 1. Deliver first, then acknowledge at the Agent-open boundary
 
-Authorized LingTai ingress must first receive and successfully deliver each Rawle message without reacting during raw polling, receipt, or queueing. When the delivered message enters the Agent's current turn and is opened, the runtime immediately places 👀 on the original message before deeper interpretation or execution. Preserve a valid Agent-open 👀; if that hook fails, repair it as the Agent's first action and report the fallback.
+Authorized LingTai ingress must first receive and successfully deliver each Eon message without reacting during raw polling, receipt, or queueing. When the delivered message enters the Agent's current turn and is opened, the runtime immediately places 👀 on the original message before deeper interpretation or execution. Preserve a valid Agent-open 👀; if that hook fails, repair it as the Agent's first action and report the fallback.
 
 When the message becomes Agent-visible, inspect the producer-owned current message and any adjacent unhandled messages in the same conversation. Notification summaries are not enough when text is truncated, ambiguous, media-bearing, or missing ordering anchors.
 
@@ -40,7 +40,7 @@ For the same Telegram conversation, consider together:
 - later corrections, cancellations, scope reductions or authorization changes;
 - the exact message/time ordering and which items this Agent has actually acknowledged.
 
-Do not wait for Rawle to package a multi-sentence paragraph. Do not assume a fragment is the final word when another message is already present.
+Do not wait for Eon to package a multi-sentence paragraph. Do not assume a fragment is the final word when another message is already present.
 
 ### 3. Decide: merge, revise, split or stop
 
@@ -52,13 +52,13 @@ Do not wait for Rawle to package a multi-sentence paragraph. Do not assume a fra
 
 - use a daemon for disposable, context-isolated analysis/execution where the parent needs only the conclusion;
 - use an avatar/persistent project specialist only when durable ownership or an ongoing relationship is needed;
-- keep the parent responsible for framing, authorization, review, synthesis, progress and Rawle-facing replies.
+- keep the parent responsible for framing, authorization, review, synthesis, progress and Eon-facing replies.
 
-Do not delegate merely to avoid understanding Rawle's combined intent. Before a review/delegation, re-read the latest Telegram producer window and pass the resulting contract—including what is out of scope and which side effects remain unauthorized—to the child/reviewer.
+Do not delegate merely to avoid understanding Eon's combined intent. Before a review/delegation, re-read the latest Telegram producer window and pass the resulting contract—including what is out of scope and which side effects remain unauthorized—to the child/reviewer.
 
 ### 4. Reply and keep cadence
 
-Acknowledge promptly in the same Telegram window, state how the new steering changes or joins the plan, and name the model/body route. For an active long task, a material steering reply counts as an immediate update but does not permit future silence; continue the task-specific cadence Rawle currently set and use the chained delayed self-email procedure in `telegram-progress-cadence`.
+Acknowledge promptly in the same Telegram window, state how the new steering changes or joins the plan, and name the model/body route. For an active long task, a material steering reply counts as an immediate update but does not permit future silence; continue the task-specific cadence Eon currently set and use the chained delayed self-email procedure in `telegram-progress-cadence`.
 
 When steering changes a tracked plan, update the Task Card promptly and follow `task-card-chinese`: all human-facing headings and prose must be Chinese, with English retained only for necessary technical proper nouns, commands, paths, model/API/protocol names, hashes and exact identifiers.
 
@@ -66,7 +66,7 @@ If several fragments can be answered coherently together, one anchored response 
 
 ## Runtime/bridge acceptance boundary
 
-Agent procedure alone cannot deliver a Telegram update into an already-running outer host turn. A bridge that only logs `accepted/queued` and waits for the turn to end does not satisfy Rawle's steering-stream requirement; raw acceptance/queueing also does not authorize 👀.
+Agent procedure alone cannot deliver a Telegram update into an already-running outer host turn. A bridge that only logs `accepted/queued` and waits for the turn to end does not satisfy Eon's steering-stream requirement; raw acceptance/queueing also does not authorize 👀.
 
 For an admitted update, the transport must not advance its durable Telegram offset until durable inbox persistence and Agent notification delivery have succeeded. A delivery exception must propagate so the same update is retried with a stable identity; configuration loaders must normalize numeric Telegram user IDs before admission. Silently committing an admitted update that failed delivery is data loss, not successful ingress.
 

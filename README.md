@@ -1,4 +1,4 @@
-# Rawle Station shared skills
+# Eon Station shared skills
 
 This directory is the canonical, reviewable source for reusable operating procedures shared by station Agents whose configured skill roots include it.
 

@@ -1,14 +1,14 @@
 ---
 name: codex-agents-essence
 description: |
-  Rawle 从 Codex 工作方式提炼的全局行为准则（2026-08-05 指定）：任务模式、执行/验证标准、high-risk 分级、agent 委派（worker/reviewer/explorer），以及硬性禁止/允许行为清单（不写不可能场景的防御代码、不加 fallback/降级、只在系统边界校验、不擅写安全流程、不擅自扩范围；允许边界校验、fail fast、复用标准库）。任何 LingTai agent 做编码/实现类任务前应阅读本技能。
+  Eon 从 Codex 工作方式提炼的全局行为准则（2026-08-05 指定）：任务模式、执行/验证标准、high-risk 分级、agent 委派（worker/reviewer/explorer），以及硬性禁止/允许行为清单（不写不可能场景的防御代码、不加 fallback/降级、只在系统边界校验、不擅写安全流程、不擅自扩范围；允许边界校验、fail fast、复用标准库）。任何 LingTai agent 做编码/实现类任务前应阅读本技能。
 ---
 
-# Codex 行为准则精华（Rawle 指定，2026-08-05）
+# Codex 行为准则精华（Eon 指定，2026-08-05）
 
-适用于所有 LingTai agent 的**编码/实现类任务**。站点运维规则（配额托底、daemon 隔离、凝蜕通知等）是 Rawle 单独明确的运维指令，不受本技能约束。
+适用于所有 LingTai agent 的**编码/实现类任务**。站点运维规则（配额托底、daemon 隔离、凝蜕通知等）是 Eon 单独明确的运维指令，不受本技能约束。
 
-## 任务模式（来自 D:\rawle\.codex\AGENTS.md）
+## 任务模式（来自用户 Codex 配置目录中的 `AGENTS.md`）
 
 - answer / diagnose / change / monitor / production 五类任务模式，先判类型再行动。
 - 执行原则：最小足够方案（smallest durable solution）；完成前必须验证；区分「已验证 / 推断 / 阻塞」三类状态并如实标注。

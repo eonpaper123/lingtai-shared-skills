@@ -1,7 +1,7 @@
 ---
 name: telegram-progress-cadence
 description: >
-  Rawle's standing Telegram responsiveness procedure: ingress first delivers, the runtime applies 👀
+  Eon's standing Telegram responsiveness procedure: ingress first delivers, the runtime applies 👀
   when the Agent opens the message in its current turn, and long tasks use task-scoped cadence plus
   a chained delayed self-email checkpoint.
 version: 1.4.0
@@ -13,16 +13,16 @@ tags: [telegram, progress, responsiveness, long-running, workflow]
 
 ## Standing contract
 
-For every task from Rawle on Telegram:
+For every task from Eon on Telegram:
 
-1. Authorized LingTai ingress must first receive and successfully deliver Rawle's message; raw polling, receipt, or queueing must not place 👀.
+1. Authorized LingTai ingress must first receive and successfully deliver Eon's message; raw polling, receipt, or queueing must not place 👀.
 2. When the delivered message enters the Agent's current turn and is opened, the runtime immediately places 👀 on the original message, before deeper interpretation or execution. That 👀 means exactly “The Agent opened this successfully delivered message.” If the open-time hook fails, repairing it must be the Agent's first action and the fallback must be reported.
 3. At the same safe Agent/tool boundary, read the ordered producer window and send a short acknowledgement in the same bot/chat.
-4. If the task is expected or observed to exceed five minutes, report every five minutes from receipt until final delivery, unless Rawle explicitly sets another interval for that current task.
+4. If the task is expected or observed to exceed five minutes, report every five minutes from receipt until final delivery, unless Eon explicitly sets another interval for that current task.
 5. When a long task starts, schedule one delayed self-email for the next due checkpoint. After each progress message, consume/dismiss the delivered reminder and schedule exactly one next checkpoint. At terminal delivery, stop chaining and clean any later-arriving stale reminder without creating another.
 6. Send a complete final result; progress messages do not replace delivery.
 
-The Agent-open 👀 does not claim completed interpretation, execution, or completion. It must not appear before Agent visibility or be delayed until analysis ends. Project-specific work must be performed and reported by the owning project total unless Rawle explicitly assigns another executor. The controller routes, monitors, and verifies.
+The Agent-open 👀 does not claim completed interpretation, execution, or completion. It must not appear before Agent visibility or be delayed until analysis ends. Project-specific work must be performed and reported by the owning project total unless Eon explicitly assigns another executor. The controller routes, monitors, and verifies.
 
 ## Fast acknowledgement
 
@@ -41,12 +41,12 @@ Do not place a decorative 👀 in the acknowledgement text as a substitute for t
 
 ## Task-scoped clock
 
-Anchor `T0` at message receipt, not when implementation starts. The default interval is five minutes. A newer explicit interval from Rawle for the current task (for example, 30 minutes) replaces the default only for that task. Material completion, failure, deployment, blocker, or risk changes are still reported immediately. When that task ends, the next task returns to the five-minute default unless Rawle sets another interval.
+Anchor `T0` at message receipt, not when implementation starts. The default interval is five minutes. A newer explicit interval from Eon for the current task (for example, 30 minutes) replaces the default only for that task. Material completion, failure, deployment, blocker, or risk changes are still reported immediately. When that task ends, the next task returns to the five-minute default unless Eon sets another interval.
 
 Send at `T0 + interval`, `+2 × interval`, and so on until one of these terminal events:
 
 - final result sent;
-- Rawle cancels or supersedes the task;
+- Eon cancels or supersedes the task;
 - task is explicitly handed to another bot and that bot has acknowledged ownership in its own Telegram window.
 
 A blocked task is still active. Report the blocker and what would unblock it at the current interval; do not disappear.
@@ -72,7 +72,7 @@ Rules:
 - After the reminder arrives, re-read the latest producer steering before acting. If the task is still active, send the due progress update, dismiss the consumed self-email, and schedule exactly one next checkpoint.
 - If a progress update is sent early for a material change, the already-scheduled reminder cannot be cancelled through the email tool. Mark it superseded; when it arrives, dismiss it as stale and do not open a duplicate cadence branch. Schedule one newly anchored checkpoint only when needed.
 - At terminal delivery, do not schedule another checkpoint. Any already-scheduled time capsule may still arrive because delayed email has no cancellation verb; dismiss it as terminal/stale and do not chain it.
-- Record safe evidence: `status=sent`, requested delay/target time, and later the delivered self-email ID plus its producer-specific `dismiss`/`read` handling. Do not expose private mailbox IDs to Rawle or peers.
+- Record safe evidence: `status=sent`, requested delay/target time, and later the delivered self-email ID plus its producer-specific `dismiss`/`read` handling. Do not expose private mailbox IDs to Eon or peers.
 
 ## Progress template
 
@@ -102,18 +102,18 @@ Do not start an opaque operation expected to block the agent loop for more than 
 
 The delegating controller must tell the project total:
 
-- Rawle's exact task and latest correction;
+- Eon's exact task and latest correction;
 - the required Telegram bot/channel for replies;
 - the effective cadence and current `T0`;
 - the delayed self-email chaining/terminal-cleanup requirement;
 - whether Luna is available or the fallback must be disclosed;
 - the evidence and final deliverable expected.
 
-The controller must not send substitute progress as though it came from the project total. It may tell Rawle that routing succeeded or report a delivery failure.
+The controller must not send substitute progress as though it came from the project total. It may tell Eon that routing succeeded or report a delivery failure.
 
 ## Molt during an active task
 
-A molt does not silently cancel the visibility contract. Immediately before an Agent-initiated molt, follow `telegram-molt-lifecycle`: send the pre-molt notice with reason/ETA/current state, persist its message ID, and after recovery react to that exact notice with Rawle's requested recovery reaction before resuming progress. Chain the next checkpoint from the recovery status message while the task remains active.
+A molt does not silently cancel the visibility contract. Immediately before an Agent-initiated molt, follow `telegram-molt-lifecycle`: send the pre-molt notice with reason/ETA/current state, persist its message ID, and after recovery react to that exact notice with Eon's requested recovery reaction before resuming progress. Chain the next checkpoint from the recovery status message while the task remains active.
 
 If a system-forced molt occurred before the Agent had a live turn to send the notice, report that boundary truthfully on recovery and resume cadence immediately. Do not fabricate a pre-notice, and do not use a later reaction as retroactive proof.
 

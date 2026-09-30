@@ -122,7 +122,7 @@ Read `context-manual` for the exact validated procedure and templates.
 
 ## 7. Telegram lifecycle handoff
 
-When the Agent has a verified Rawle Telegram outbound route, add this mandatory boundary immediately before an Agent-initiated molt:
+When the Agent has a verified Eon Telegram outbound route, add this mandatory boundary immediately before an Agent-initiated molt:
 
 1. Finish the durable handoff far enough that `context(action="molt")` is the next lifecycle step.
 2. Send an “entering molt now” Telegram notice from the Agent's own window with the reason, honest recovery ETA in minutes, current task state, and first post-recovery action.

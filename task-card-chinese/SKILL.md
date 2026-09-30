@@ -1,7 +1,7 @@
 ---
 name: task-card-chinese
 description: >
-  Rawle's language and readability contract for every human-facing Task Card. Read before creating,
+  Eon's language and readability contract for every human-facing Task Card. Read before creating,
   starting, retrying or materially updating a Task Card renderer. Requires Chinese headings, status,
   progress, blockers, next steps and ETA; permits English only for technical proper nouns, commands,
   paths, model/API/protocol names, hashes and exact identifiers whose translation would be unnatural
@@ -15,7 +15,7 @@ tags: [task-card, language, chinese, readability]
 
 ## 核心规则
 
-所有给 Rawle 查看的 Task Card，除确实不宜常规翻译的技术名词和精确标识外，必须使用中文。
+所有给 Eon 查看的 Task Card，除确实不宜常规翻译的技术名词和精确标识外，必须使用中文。
 
 必须写中文的部分：
 
@@ -82,13 +82,13 @@ Task Card renderer 应从小型、明确的状态源生成完整卡片。无论�
 - 当前状态、阻塞、下一步和预计时间真实；
 - 技术标识没有被错误翻译或截断。
 
-若 Rawle 指出一处英文难读，先立即修正当前可见卡片，再更新共享规范；不要只承诺以后改。
+若 Eon 指出一处英文难读，先立即修正当前可见卡片，再更新共享规范；不要只承诺以后改。
 
 ## 生命周期
 
-仅为 Rawle 正在跟踪的长期、多步骤或并行工作启用 Task Card。保持状态及时更新；任务完成、取消或放弃后使用 Task Card 工具的 `remove`，不得留下误导性的旧卡片。
+仅为 Eon 正在跟踪的长期、多步骤或并行工作启用 Task Card。保持状态及时更新；任务完成、取消或放弃后使用 Task Card 工具的 `remove`，不得留下误导性的旧卡片。
 
-## 简洁性规则（2026-08-05 Rawle 要求）
+## 简洁性规则（2026-08-05 Eon 要求）
 
 卡片的价值在于一目了然，不在于记录全部过程。不许叠加长历史；当卡片变得太长时，就是该精简或归档的信号。
 

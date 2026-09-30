@@ -3,7 +3,7 @@ name: telegram-station-outbound
 description: >
   Safe Telegram reaction/reply fallback when an `mcp.telegram` notification arrives but no
   dedicated Telegram action exists, plus the stored-message branch for reacting to an Agent's own
-  pre-molt notice after recovery. Applies 👀 only after actual live-turn reading, uses Rawle's latest
+  pre-molt notice after recovery. Applies 👀 only after actual live-turn reading, uses Eon's latest
   direct base-👌 recovery semantics, uses the existing local secret without exposing it, repairs a
   missing Agent-open 👀 when necessary, and never provisions credentials or sends documents.
 version: 1.4.0
@@ -164,12 +164,12 @@ Read `telegram-molt-lifecycle` first. This branch is for a recovered Agent that 
 
 1. Load only the non-secret `account`, `chat_id`, `message_id`, send timestamp, and requested recovery reaction from the persisted lifecycle block.
 2. Verify the account still maps to this station's existing `.secrets/telegram.json`; never copy a credential across bots.
-3. Use the same secret-loading pattern above. Build `setMessageReaction` for the exact stored `chat_id`/`message_id` and use Rawle's latest requested base emoji `👌` directly.
+3. Use the same secret-loading pattern above. Build `setMessageReaction` for the exact stored `chat_id`/`message_id` and use Eon's latest requested base emoji `👌` directly.
 4. If Telegram returns a typed 400/invalid-reaction rejection for base `👌`, preserve that one failure receipt and report the lifecycle acknowledgement as blocked; do not guess or retry an alternate emoji.
 5. Return safe evidence: stored notice message ID, exact accepted emoji (when accepted), reaction success, recovery reply message ID, and actual elapsed recovery time. Never output the token, base URI, or secret JSON.
 6. Mark the durable lifecycle receipt complete only after the reaction/reply result is known.
 
-This is a lifecycle-completion reaction, not the ordinary Agent-open receipt. Do not use `👌` as a substitute for 👀 on Rawle's incoming message.
+This is a lifecycle-completion reaction, not the ordinary Agent-open receipt. Do not use `👌` as a substitute for 👀 on Eon's incoming message.
 
 ## Failure branches
 
@@ -181,8 +181,8 @@ This is a lifecycle-completion reaction, not the ordinary Agent-open receipt. Do
 - **HTML requested but the wrapper cannot carry `parse_mode`:** stay on the plain path and report rich delivery unavailable on this station.
 - **Human pasted credential:** acknowledge the message with the existing bot if possible, warn the human to revoke/regenerate, leave configuration untouched, and keep the task pending until secure local injection is confirmed.
 
-## Network hard rules (Rawle :249/:279 — 2026-08-05, control-total propagated)
-- 👀 read receipt is the FIRST action when you open a Rawle Telegram message: manually react 👀 via your own .secrets/telegram.json + curl setMessageReaction (auto-hook may fail; never skip).
+## Network hard rules (Eon :249/:279 — 2026-08-05, control-total propagated)
+- 👀 read receipt is the FIRST action when you open a Eon Telegram message: manually react 👀 via your own .secrets/telegram.json + curl setMessageReaction (auto-hook may fail; never skip).
 - Self-check: read your .status.json each turn; if active_turn.elapsed_seconds > 600 you are stuck — recover (kill escaped child trees / taskkill /T /F) or ask control-total; do not sit silent.
 - Long CLI children (opencode/codex/claude) can escape shell timeouts on Windows and wedge the turn; use async+poll or bounded process-tree-safe runs.
 - Control-total runs a 5-min stuck-agent watchdog (task LingTai_StuckAgentWatchdog) and will interrupt/restart stuck agents.

@@ -39,9 +39,9 @@ local commit is never permission to publish or integrate.
 Each requires separate written authority plus, for destructive operations, a
 recovery plan. "It seemed safe" is not authority.
 
-## Rawle 强调（2026-08-05，修正简化版）
+## Eon 强调（2026-08-05，修正简化版）
 
-Rawle 的 git 管理要求就是：<b>做好本地 commit 记录与 GitHub 记录，及时 push/PR，
+Eon 的 git 管理要求就是：<b>做好本地 commit 记录与 GitHub 记录，及时 push/PR，
 不丢失劳动成果</b>。不要执行繁重的 preflight / 隔离分支 / staging 校验仪式，
 避免浪费 token。破坏性、远程删除或强推等操作仍须单独授权；其余保持简单直接。
 

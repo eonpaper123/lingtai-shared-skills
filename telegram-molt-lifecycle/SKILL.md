@@ -1,7 +1,7 @@
 ---
 name: telegram-molt-lifecycle
 description: >
-  Rawle's Telegram lifecycle contract for LingTai molt. Before an Agent-initiated molt, announce
+  Eon's Telegram lifecycle contract for LingTai molt. Before an Agent-initiated molt, announce
   reason, ETA and resumable state and persist the message receipt; after recovery, react to that
   notice directly with base 👌 and report actual time. Read before any Agent-initiated context molt
   or after a system-forced molt with no pre-notice. It exposes the forced-molt runtime-hook boundary
@@ -15,12 +15,12 @@ tags: [telegram, workflow, lifecycle, context]
 
 ## Standing contract
 
-For every Agent that has a verified Rawle Telegram outbound route:
+For every Agent that has a verified Eon Telegram outbound route:
 
 1. Immediately before the Agent calls `context(action="molt")`, send a Telegram notice from that Agent's own bot/window.
 2. State the molt reason, honest ETA in minutes, current task state, and the first post-recovery action.
 3. Persist the successful outbound receipt so the successor can locate the exact notice message.
-4. After recovery, make the first lifecycle acknowledgement an Agent-initiated reaction on that same notice: Rawle's latest instruction requires base `👌` directly.
+4. After recovery, make the first lifecycle acknowledgement an Agent-initiated reaction on that same notice: Eon's latest instruction requires base `👌` directly.
 5. Report actual recovery time and resume or re-route the interrupted task.
 
 This complements `context-manual`; it does not replace the mandatory four-store, session-journal, and successor-briefing procedure.
@@ -74,12 +74,12 @@ Call `context(action="molt")` only after the notice receipt and its durable loca
 
 1. Reconstruct from Pad, the molt summary, session journal, and current producer messages.
 2. Locate the exact pre-molt Telegram message from the durable `molt_notice` block. Do not search by vague text when a message ID exists.
-3. From the recovered Agent's own tool action, add Rawle's latest requested base `👌` reaction directly to that message.
+3. From the recovered Agent's own tool action, add Eon's latest requested base `👌` reaction directly to that message.
 4. If Telegram explicitly rejects base `👌`, preserve that one typed failure receipt and report the lifecycle acknowledgement as blocked; do not guess or retry another emoji.
 5. Send a short recovery status with actual elapsed time, current task state, and the first resumed action. Resume the ordinary five-minute cadence if a long task is still active.
 6. Mark the durable lifecycle block `complete` with reaction/reply receipts, or `blocked` with the typed failure receipt; do not leave a stale pending marker.
 
-A transport success proves the API accepted the action. It does not prove Rawle visually saw it; keep transport and visual claims separate.
+A transport success proves the API accepted the action. It does not prove Eon visually saw it; keep transport and visual claims separate.
 
 ## System-forced molt boundary
 
@@ -88,7 +88,7 @@ A system-forced molt can begin before the Agent receives another live turn. In t
 After waking from a forced molt with no stored notice receipt:
 
 1. Do not fabricate or backdate a pre-molt message.
-2. Immediately tell Rawle in the Agent's own Telegram window that a system-forced molt occurred, why the pre-notice could not be sent, the actual interruption duration if known, and the resumed task state.
+2. Immediately tell Eon in the Agent's own Telegram window that a system-forced molt occurred, why the pre-notice could not be sent, the actual interruption duration if known, and the resumed task state.
 3. Record and route the missing runtime hook as an operational gap to control/project ownership.
 4. Continue the task and five-minute cadence.
 
@@ -96,7 +96,7 @@ A later message or reaction is recovery evidence only; it cannot retroactively p
 
 ## Agents without a verified Telegram route
 
-Do not guess an MCP registration, reuse another bot's credential, or ask Rawle to paste a token. Before an Agent-initiated molt, notify the project total through the existing internal channel and request that the total use its verified Rawle Telegram route to relay the notice. Mark direct compliance blocked by routing until an authorized owner provisions and verifies the canonical route.
+Do not guess an MCP registration, reuse another bot's credential, or ask Eon to paste a token. Before an Agent-initiated molt, notify the project total through the existing internal channel and request that the total use its verified Eon Telegram route to relay the notice. Mark direct compliance blocked by routing until an authorized owner provisions and verifies the canonical route.
 
 ## Evidence checklist
 
